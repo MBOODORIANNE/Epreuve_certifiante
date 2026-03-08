@@ -31,14 +31,8 @@ jobs:
           distribution: 'temurin'
           cache: maven
 
-      - name: 🏗️ Compiler le projet
-        run: mvn compile -B
-
-      - name: 🧪 Lancer les tests unitaires et d'intégration
-        run: mvn test -B -Dspring.profiles.active=test
-
-      - name: 📊 Générer le rapport de couverture JaCoCo
-        run: mvn jacoco:report
+      - name: 🧪 Compiler, Tester et Vérifier la couverture
+        run: mvn verify -B -Dspring.profiles.active=test
 
       - name: 📤 Publier les résultats de tests
         uses: actions/upload-artifact@v4
@@ -48,9 +42,6 @@ jobs:
           path: |
             target/surefire-reports/
             target/site/jacoco/
-
-      - name: ✅ Vérifier le seuil de couverture (≥ 70%)
-        run: mvn jacoco:check
 
   # ══════════════════════════════════════════════════════════════════
   # ÉTAPE 2 : Analyse SonarQube
