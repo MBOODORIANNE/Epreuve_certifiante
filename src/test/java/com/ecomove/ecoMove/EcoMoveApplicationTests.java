@@ -1,10 +1,10 @@
-package com.example.examen_certifiant;
+package com.ecomove.ecoMove;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class ExamenCertifiantApplicationTests {
+class EcoMoveApplicationTests {
 
     @Test
     void contextLoads() {
