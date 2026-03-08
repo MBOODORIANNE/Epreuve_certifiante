@@ -69,6 +69,9 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         run: |
           mvn -B verify sonar:sonar \
+            -Dsonar.organization=mboodorianne-github \
+            -Dsonar.projectKey=MBOODORIANNE_Epreuve_certifiante \
+            -Dsonar.projectName=Epreuve_certifiante \
             -Dsonar.host.url=https://sonarcloud.io \
             -Dsonar.token=$SONAR_TOKEN \
             -Dsonar.coverage.jacoco.xmlReportPaths=target/site/jacoco/jacoco.xml \
