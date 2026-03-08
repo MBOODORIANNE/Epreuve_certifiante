@@ -1,0 +1,79 @@
+version: '3.8'
+
+services:
+  # ── Base de données MySQL ──────────────────────────────────────────
+  mysql:
+    image: mysql:8.0
+    container_name: ecomove-mysql
+    environment:
+      MYSQL_DATABASE: ecomovedb
+      MYSQL_ROOT_PASSWORD: root_secret
+      MYSQL_USER: ecomove
+      MYSQL_PASSWORD: ecomove_secret
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - ecomove-network
+
+  # ── Application Spring Boot ────────────────────────────────────────
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: ecomove-app
+    depends_on:
+      mysql:
+        condition: service_healthy
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/ecomovedb
+      SPRING_DATASOURCE_USERNAME: ecomove
+      SPRING_DATASOURCE_PASSWORD: ecomove_secret
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      APP_JWT_SECRET: ecomove-super-secret-jwt-key-production-2026-must-be-256-bits-minimum
+      APP_JWT_EXPIRATION_MS: 86400000
+    volumes:
+      - ./logs:/app/logs
+    networks:
+      - ecomove-network
+    healthcheck:
+      test: [ "CMD", "wget", "-q", "--spider", "http://localhost:8080/actuator/health" ]
+      interval: 30s
+      timeout: 10s
+      start-period: 30s
+      retries: 3
+
+  # ── SonarQube ────────────────────────────────────────────────────
+  sonarqube:
+    image: sonarqube:10-community
+    container_name: ecomove-sonar
+    ports:
+      - "9000:9000"
+    environment:
+      SONAR_ES_BOOTSTRAP_CHECKS_DISABLE: "true"
+    volumes:
+      - sonar_data:/opt/sonarqube/data
+      - sonar_logs:/opt/sonarqube/logs
+      - sonar_extensions:/opt/sonarqube/extensions
+    networks:
+      - ecomove-network
+
+volumes:
+  mysql_data:
+  sonar_data:
+  sonar_logs:
+  sonar_extensions:
+
+
+networks:
+  ecomove-network:
+    driver: bridge
