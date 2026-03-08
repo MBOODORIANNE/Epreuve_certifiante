@@ -8,7 +8,7 @@ on:
 
 env:
   JAVA_VERSION: '21'
-  DOCKER_IMAGE: ecomove/ecomove-api
+  DOCKER_IMAGE: atanganaorlys/ecomove-api
 
 jobs:
   # ══════════════════════════════════════════════════════════════════
